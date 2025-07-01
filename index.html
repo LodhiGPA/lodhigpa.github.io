@@ -9,18 +9,18 @@
   <style>
     body {
       font-family: 'Space Grotesk', sans-serif;
-      background-color: #4a3c00; /* dark yellow brown */
-      color: #fff8dc; /* light cream */
+      background-color: #202A44; /* dark blue */
+      color: white;
       margin: 0;
       padding: 2rem;
     }
     .glass {
-      background: rgba(255, 204, 0, 0.15); /* transparent dark yellow */
+      background: rgba(255, 255, 255, 0.1); /* transparent white */
       backdrop-filter: blur(10px);
       border-radius: 1rem;
       padding: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     }
     .input-group {
       display: flex;
@@ -34,8 +34,8 @@
       border-radius: 0.5rem;
       width: 100%;
       box-sizing: border-box;
-      background-color: rgba(255, 204, 0, 0.1);
-      color: #3b2f00;
+      background-color: rgba(255, 255, 255, 0.2); /* lighter transparent white */
+      color: #202A44; /* dark blue */
       font-weight: 600;
     }
     input[type=number]::-webkit-inner-spin-button,
@@ -45,8 +45,8 @@
     }
     button {
       padding: 0.4rem 0.75rem;
-      background-color: #ffcc00;
-      color: #3b2f00;
+      background-color: #3B5998; /* medium blue */
+      color: white;
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
@@ -55,7 +55,7 @@
       user-select: none;
     }
     button:hover {
-      background-color: #e6b800;
+      background-color: #2E4372; /* darker blue */
     }
     .center {
       text-align: center;
@@ -69,31 +69,31 @@
     .key-table {
       margin: 1rem auto;
       border-collapse: collapse;
-      background: rgba(255,204,0,0.15);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 1rem;
       overflow: hidden;
       max-width: 500px;
-      color: #3b2f00;
+      color: #202A44;
       font-weight: 700;
     }
     .key-table th, .key-table td {
       padding: 0.5rem 1rem;
-      border: 1px solid rgba(255,204,0,0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       text-align: center;
-      background-color: rgba(255, 204, 0, 0.25);
+      background-color: rgba(255, 255, 255, 0.2);
     }
     .highlight {
-      background-color: #ffcc00;
-      color: #3b2f00;
+      background-color: #3B5998;
+      color: white;
       font-weight: bold;
     }
     .tiny {
       font-size: 0.9rem;
-      color: #e6d85c;
+      color: #B0C4DE; /* light steel blue */
     }
     .btn-delete {
-      background-color: #cc9900;
-      color: #3b2f00;
+      background-color: #2E4372; /* darker blue */
+      color: white;
       padding: 0.2rem 0.5rem;
       font-weight: normal;
       font-size: 0.9rem;
@@ -105,7 +105,7 @@
       user-select: none;
     }
     .btn-delete:hover {
-      background-color: #b38600;
+      background-color: #1C2D4F; /* even darker blue */
     }
     .subject-header {
       display: flex;
@@ -118,7 +118,7 @@
       width: 50px;
       font-weight: bold;
       font-size: 0.8rem;
-      color: #3b2f00;
+      color: white;
       text-align: center;
       user-select: none;
     }
@@ -314,7 +314,7 @@ function updateGPA() {
       type: "bar",
       data: {
         labels: subjectGPAs.map(s => s.label),
-        datasets: [{ label: "Subject GPA", data: subjectGPAs.map(s => s.gpa), backgroundColor: "#ffcc00" }]
+        datasets: [{ label: "Subject GPA", data: subjectGPAs.map(s => s.gpa), backgroundColor: "#3B5998" }]
       },
       options: {
         animation: false,
