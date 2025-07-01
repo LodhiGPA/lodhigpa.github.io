@@ -9,18 +9,18 @@
   <style>
     body {
       font-family: 'Space Grotesk', sans-serif;
-      background-color: #202A44;
-      color: white;
+      background-color: #4a3c00; /* dark yellow brown */
+      color: #fff8dc; /* light cream */
       margin: 0;
       padding: 2rem;
     }
     .glass {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 204, 0, 0.15); /* transparent dark yellow */
       backdrop-filter: blur(10px);
       border-radius: 1rem;
       padding: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
     }
     .input-group {
       display: flex;
@@ -34,16 +34,25 @@
       border-radius: 0.5rem;
       width: 100%;
       box-sizing: border-box;
+      background-color: rgba(255, 204, 0, 0.1);
+      color: #3b2f00;
+      font-weight: 600;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     button {
       padding: 0.4rem 0.75rem;
-      background-color: #FFCD00;
-      color: #202A44;
+      background-color: #ffcc00;
+      color: #3b2f00;
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
       font-weight: bold;
       transition: background 0.3s;
+      user-select: none;
     }
     button:hover {
       background-color: #e6b800;
@@ -52,7 +61,7 @@
       text-align: center;
     }
     canvas {
-      background: #ffffff0a;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 1rem;
       padding: 1rem;
       max-width: 100%;
@@ -60,28 +69,31 @@
     .key-table {
       margin: 1rem auto;
       border-collapse: collapse;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,204,0,0.15);
       border-radius: 1rem;
       overflow: hidden;
       max-width: 500px;
+      color: #3b2f00;
+      font-weight: 700;
     }
     .key-table th, .key-table td {
       padding: 0.5rem 1rem;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,204,0,0.3);
       text-align: center;
+      background-color: rgba(255, 204, 0, 0.25);
     }
     .highlight {
-      background-color: #FFCD00;
-      color: #202A44;
+      background-color: #ffcc00;
+      color: #3b2f00;
       font-weight: bold;
     }
     .tiny {
       font-size: 0.9rem;
-      color: #ccc;
+      color: #e6d85c;
     }
     .btn-delete {
-      background-color: #ff4d4d;
-      color: white;
+      background-color: #cc9900;
+      color: #3b2f00;
       padding: 0.2rem 0.5rem;
       font-weight: normal;
       font-size: 0.9rem;
@@ -90,25 +102,31 @@
       border: none;
       margin-left: 0.3rem;
       transition: background 0.2s;
+      user-select: none;
     }
     .btn-delete:hover {
-      background-color: #e04343;
+      background-color: #b38600;
     }
     .subject-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.5rem;
+      gap: 0.5rem;
     }
     .assessment-label {
       width: 50px;
       font-weight: bold;
+      font-size: 0.8rem;
+      color: #3b2f00;
+      text-align: center;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
-<h1 class="center">GPA Calculator 🧲</h1>
+<h1 class="center">GPA Calculator 🧮</h1>
 <p class="center tiny">Estimation only — GPA rounding follows fixed steps.</p>
 
 <div class="center" style="margin-bottom: 1rem;">
@@ -139,23 +157,35 @@
   <tr id="keyRow"></tr>
 </table>
 
-<!-- 🆕 Added GPA to Grade Scale Below -->
-<h3 class="center">Grade to GPA Scale</h3>
-<div class="glass" style="max-width: 500px; margin: 0 auto; font-size: 0.95rem; line-height: 1.6;">
-  <strong>15</strong> = A+<br>
-  <strong>14</strong> = A<br>
-  <strong>13</strong> = A−<br>
-  <strong>12</strong> = B+<br>
-  <strong>11</strong> = B<br>
-  <strong>10</strong> = B−<br>
-  <strong>9</strong> = C+<br>
-  <strong>8</strong> = C<br>
-  <strong>7</strong> = C−<br>
-  <strong>6</strong> = D+<br>
-  <strong>5</strong> = D<br>
-  <strong>4</strong> = D−<br>
-  <strong>3</strong> or below = E / F
-</div>
+<!-- GPA to Letter Grade Conversion Table -->
+<h3 class="center">📊 GPA to Letter Grade Conversion</h3>
+<table class="key-table" style="max-width: 400px; margin: 1rem auto;">
+  <thead>
+    <tr>
+      <th>GPA</th>
+      <th>Letter Grade</th>
+      <th>Approx. Percentage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>15</td><td>A+</td><td>95–100%</td></tr>
+    <tr><td>14</td><td>A</td><td>90–94%</td></tr>
+    <tr><td>13</td><td>A−</td><td>85–89%</td></tr>
+    <tr><td>12</td><td>B+</td><td>80–84%</td></tr>
+    <tr><td>11</td><td>B</td><td>75–79%</td></tr>
+    <tr><td>10</td><td>B−</td><td>70–74%</td></tr>
+    <tr><td>9</td><td>C+</td><td>65–69%</td></tr>
+    <tr><td>8</td><td>C</td><td>60–64%</td></tr>
+    <tr><td>7</td><td>C−</td><td>55–59%</td></tr>
+    <tr><td>6</td><td>D+</td><td>50–54%</td></tr>
+    <tr><td>5</td><td>D</td><td>45–49%</td></tr>
+    <tr><td>4</td><td>D−</td><td>40–44%</td></tr>
+    <tr><td>3</td><td>E+</td><td>35–39%</td></tr>
+    <tr><td>2</td><td>E</td><td>30–34%</td></tr>
+    <tr><td>1</td><td>E−</td><td>25–29%</td></tr>
+    <tr><td>0</td><td>F</td><td>Below 25%</td></tr>
+  </tbody>
+</table>
 
 <script>
 const allowedDecimals = [0.00, 0.14, 0.29, 0.43, 0.57, 0.71, 0.84];
@@ -213,7 +243,14 @@ function renderSubjects() {
         </select>
         <button class="btn-delete" onclick="subjects.splice(${index},1); renderSubjects()">Delete Subject</button>
       </div>
-      <div id="assessments-${index}"></div>
+      <div id="assessments-${index}">
+        <div class="input-group">
+          <div class="assessment-label">Mark</div>
+          <div class="assessment-label">Out Of</div>
+          <div class="assessment-label">Weight</div>
+          <div style="width: 25px;"></div>
+        </div>
+      </div>
       <button onclick="subjects[${index}].assessments.push({score:0,outOf:100,weight:1}); renderSubjects()">+ Add Assessment</button>
     `;
     container.appendChild(div);
@@ -223,9 +260,9 @@ function renderSubjects() {
       const row = document.createElement('div');
       row.className = 'input-group';
       row.innerHTML = `
-        <input type="number" value="${a.score}" placeholder="Score" oninput="subjects[${index}].assessments[${aIdx}].score = parseFloat(this.value)||0; updateGPA()" />
-        <input type="number" value="${a.outOf}" placeholder="Out Of" oninput="subjects[${index}].assessments[${aIdx}].outOf = parseFloat(this.value)||100; updateGPA()" />
-        <input type="number" value="${a.weight}" placeholder="Weight" oninput="subjects[${index}].assessments[${aIdx}].weight = parseFloat(this.value)||1; updateGPA()" />
+        <input type="number" value="${a.score}" min="0" placeholder="Score" oninput="subjects[${index}].assessments[${aIdx}].score = parseFloat(this.value)||0; updateGPA()" />
+        <input type="number" value="${a.outOf}" min="1" placeholder="Out Of" oninput="subjects[${index}].assessments[${aIdx}].outOf = parseFloat(this.value)||100; updateGPA()" />
+        <input type="number" value="${a.weight}" min="0" step="0.01" placeholder="Weight" oninput="subjects[${index}].assessments[${aIdx}].weight = parseFloat(this.value)||1; updateGPA()" />
         <button class="btn-delete" onclick="subjects[${index}].assessments.splice(${aIdx},1); renderSubjects()">X</button>
       `;
       assessDiv.appendChild(row);
@@ -277,7 +314,7 @@ function updateGPA() {
       type: "bar",
       data: {
         labels: subjectGPAs.map(s => s.label),
-        datasets: [{ label: "Subject GPA", data: subjectGPAs.map(s => s.gpa), backgroundColor: "#FFCD00" }]
+        datasets: [{ label: "Subject GPA", data: subjectGPAs.map(s => s.gpa), backgroundColor: "#ffcc00" }]
       },
       options: {
         animation: false,
@@ -302,8 +339,9 @@ function updateGPA() {
   });
 }
 
-renderSubjects();
+// Start with one subject
+addSubject();
 </script>
-<h3>Made by @lodhigpa (MuhammadHassanLodhi) and @joypreetsinghbhullar (Base Web)</h3>
+<h3>Made by @lodhigpa (MuhammadHassanLodhi) </h3>
 </body>
 </html>
