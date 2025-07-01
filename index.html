@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GPA Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #202A44;
+      color: white;
+      margin: 0;
+      padding: 2rem;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+    input[type=number], input[type=text], select {
+      padding: 0.4rem;
+      border: none;
+      border-radius: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.4rem 0.75rem;
+      background-color: #FFCD00;
+      color: #202A44;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #e6b800;
+    }
+    .center {
+      text-align: center;
+    }
+    canvas {
+      background: #ffffff0a;
+      border-radius: 1rem;
+      padding: 1rem;
+      max-width: 100%;
+    }
+    .key-table {
+      margin: 1rem auto;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.08);
+      border-radius: 1rem;
+      overflow: hidden;
+      max-width: 500px;
+    }
+    .key-table th, .key-table td {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .highlight {
+      background-color: #FFCD00;
+      color: #202A44;
+      font-weight: bold;
+    }
+    .tiny {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+    .btn-delete {
+      background-color: #ff4d4d;
+      color: white;
+      padding: 0.2rem 0.5rem;
+      font-weight: normal;
+      font-size: 0.9rem;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      border: none;
+      margin-left: 0.3rem;
+      transition: background 0.2s;
+    }
+    .btn-delete:hover {
+      background-color: #e04343;
+    }
+    .subject-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .assessment-label {
+      width: 50px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1 class="center">GPA Calculator 🧲</h1>
+<p class="center tiny">Estimation only — GPA rounding follows fixed steps.</p>
+
+<div class="center" style="margin-bottom: 1rem;">
+  <label for="termSelect">Select Term/Semester: </label>
+  <select id="termSelect" onchange="renderSubjects()">
+    <option value="all">All</option>
+    <option value="term1">Term 1</option>
+    <option value="term2">Term 2</option>
+    <option value="term3">Term 3</option>
+    <option value="term4">Term 4</option>
+    <option value="semester1">Semester 1</option>
+    <option value="semester2">Semester 2</option>
+  </select>
+</div>
+
+<button onclick="addSubject()">+ Add Subject</button>
+<div id="subjectsContainer"></div>
+
+<h2 class="center">Your GPA (Rounded): <span id="overallGPA">0.00</span> / 15</h2>
+<h3 class="center tiny">Raw GPA: <span id="rawGPA">0.00</span></h3>
+<h2 class="center">Semester GPA: <span id="semesterGPA">0.00</span> / 15</h2>
+<p class="center" id="motivational"></p>
+
+<canvas id="gpaChart" width="400" height="200"></canvas>
+
+<h3 class="center">GPA Decimal Rounding Key</h3>
+<table class="key-table" id="gpaKeyTable">
+  <tr id="keyRow"></tr>
+</table>
+
+<script>
+const allowedDecimals = [0.00, 0.14, 0.29, 0.43, 0.57, 0.71, 0.84];
+let subjects = [];
+let gpaChart = null;
+
+function roundToGPAConstant(value) {
+  const intPart = Math.floor(value);
+  const decimal = value - intPart;
+  let closest = allowedDecimals.reduce((a, b) => Math.abs(b - decimal) < Math.abs(a - decimal) ? b : a);
+  return parseFloat((intPart + closest).toFixed(2));
+}
+
+function percentageToGPA(percent) {
+  const scale = [
+    { min: 95, gpa: 15 }, { min: 90, gpa: 14 }, { min: 85, gpa: 13 },
+    { min: 80, gpa: 12 }, { min: 75, gpa: 11 }, { min: 70, gpa: 10 },
+    { min: 65, gpa: 9 }, { min: 60, gpa: 8 }, { min: 55, gpa: 7 },
+    { min: 50, gpa: 6 }, { min: 45, gpa: 5 }, { min: 40, gpa: 4 },
+    { min: 35, gpa: 3 }, { min: 30, gpa: 2 }, { min: 25, gpa: 1 },
+    { min: 0, gpa: 0 },
+  ];
+  return scale.find(s => percent >= s.min)?.gpa || 0;
+}
+
+function addSubject() {
+  const selectedTerm = document.getElementById('termSelect').value || 'term1';
+  subjects.push({ name: '', assessments: [], term: selectedTerm });
+  renderSubjects();
+}
+
+function renderSubjects() {
+  const container = document.getElementById('subjectsContainer');
+  const selectedTerm = document.getElementById('termSelect').value;
+  container.innerHTML = '';
+
+  subjects.forEach((sub, index) => {
+    const show = selectedTerm === 'all' ||
+                sub.term === selectedTerm ||
+                (selectedTerm === 'semester1' && (sub.term === 'term1' || sub.term === 'term2')) ||
+                (selectedTerm === 'semester2' && (sub.term === 'term3' || sub.term === 'term4'));
+
+    if (!show) return;
+
+    const div = document.createElement('div');
+    div.className = 'glass';
+    div.innerHTML = `
+      <div class="subject-header">
+        <input type="text" placeholder="Subject Name" value="${sub.name}" onchange="subjects[${index}].name = this.value; updateGPA()" />
+        <select onchange="subjects[${index}].term = this.value; renderSubjects()">
+          <option value="term1" ${sub.term === 'term1' ? 'selected' : ''}>Term 1</option>
+          <option value="term2" ${sub.term === 'term2' ? 'selected' : ''}>Term 2</option>
+          <option value="term3" ${sub.term === 'term3' ? 'selected' : ''}>Term 3</option>
+          <option value="term4" ${sub.term === 'term4' ? 'selected' : ''}>Term 4</option>
+        </select>
+        <button class="btn-delete" onclick="subjects.splice(${index},1); renderSubjects()">Delete Subject</button>
+      </div>
+      <div id="assessments-${index}"></div>
+      <button onclick="subjects[${index}].assessments.push({score:0,outOf:100,weight:1}); renderSubjects()">+ Add Assessment</button>
+    `;
+    container.appendChild(div);
+
+    const assessDiv = div.querySelector(`#assessments-${index}`);
+    sub.assessments.forEach((a, aIdx) => {
+      const row = document.createElement('div');
+      row.className = 'input-group';
+      row.innerHTML = `
+        <input type="number" value="${a.score}" placeholder="Score" oninput="subjects[${index}].assessments[${aIdx}].score = parseFloat(this.value)||0; updateGPA()" />
+        <input type="number" value="${a.outOf}" placeholder="Out Of" oninput="subjects[${index}].assessments[${aIdx}].outOf = parseFloat(this.value)||100; updateGPA()" />
+        <input type="number" value="${a.weight}" placeholder="Weight" oninput="subjects[${index}].assessments[${aIdx}].weight = parseFloat(this.value)||1; updateGPA()" />
+        <button class="btn-delete" onclick="subjects[${index}].assessments.splice(${aIdx},1); renderSubjects()">X</button>
+      `;
+      assessDiv.appendChild(row);
+    });
+  });
+
+  updateGPA();
+}
+
+function updateGPA() {
+  const selectedTerm = document.getElementById('termSelect').value;
+  let totalGPA = 0, rawGPA = 0, count = 0;
+  let semGPA = 0, semRaw = 0, semCount = 0;
+  const subjectGPAs = [];
+
+  subjects.forEach(sub => {
+    let weightedTotal = 0, weightSum = 0;
+    sub.assessments.forEach(a => {
+      const percent = a.outOf > 0 ? (a.score / a.outOf) * 100 : 0;
+      const gpa = percentageToGPA(percent);
+      weightedTotal += gpa * a.weight;
+      weightSum += a.weight;
+    });
+    const avg = weightSum ? weightedTotal / weightSum : 0;
+    const rounded = roundToGPAConstant(avg);
+    totalGPA += rounded;
+    rawGPA += avg;
+    count++;
+
+    const show = selectedTerm === 'all' ||
+                sub.term === selectedTerm ||
+                (selectedTerm === 'semester1' && (sub.term === 'term1' || sub.term === 'term2')) ||
+                (selectedTerm === 'semester2' && (sub.term === 'term3' || sub.term === 'term4'));
+    if (show) {
+      semGPA += rounded;
+      semRaw += avg;
+      semCount++;
+    }
+    subjectGPAs.push({ label: sub.name || "Unnamed", gpa: rounded });
+  });
+
+  document.getElementById('overallGPA').textContent = count ? roundToGPAConstant(totalGPA / count).toFixed(2) : '0.00';
+  document.getElementById('rawGPA').textContent = count ? (rawGPA / count).toFixed(2) : '0.00';
+  document.getElementById('semesterGPA').textContent = semCount ? roundToGPAConstant(semGPA / semCount).toFixed(2) : '0.00';
+  document.getElementById('motivational').textContent = semCount && (semGPA / semCount) < 13 ? "You're more than a number 💙" : '';
+
+  if (!gpaChart) {
+    gpaChart = new Chart(document.getElementById("gpaChart"), {
+      type: "bar",
+      data: {
+        labels: subjectGPAs.map(s => s.label),
+        datasets: [{ label: "Subject GPA", data: subjectGPAs.map(s => s.gpa), backgroundColor: "#FFCD00" }]
+      },
+      options: {
+        animation: false,
+        responsive: true,
+        scales: { y: { beginAtZero: true, max: 15 } }
+      }
+    });
+  } else {
+    gpaChart.data.labels = subjectGPAs.map(s => s.label);
+    gpaChart.data.datasets[0].data = subjectGPAs.map(s => s.gpa);
+    gpaChart.update('none');
+  }
+
+  const decimal = parseFloat(((rawGPA / count) % 1).toFixed(2));
+  const row = document.getElementById("keyRow");
+  row.innerHTML = '';
+  allowedDecimals.forEach(d => {
+    const td = document.createElement("td");
+    td.textContent = d.toFixed(2);
+    if (Math.abs(d - decimal) < 0.07) td.className = "highlight";
+    row.appendChild(td);
+  });
+}
+
+renderSubjects();
+</script>
+
+</body>
+</html>
